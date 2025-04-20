@@ -1,0 +1,13 @@
+[gd_scene load_steps=4 format=3 uid="uid://6mu73r8dauop"]
+
+[ext_resource type="Script" path="res://Main.cs" id="1_7bi66"]
+[ext_resource type="PackedScene" uid="uid://c5iy3t6x15rab" path="res://maps/emptyBox.tscn" id="1_w45ip"]
+[ext_resource type="PackedScene" uid="uid://dlvdhipm84y17" path="res://client/player/Player.tscn" id="2_158uk"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_7bi66")
+
+[node name="EmptyBox" parent="." instance=ExtResource("1_w45ip")]
+
+[node name="Player" parent="." instance=ExtResource("2_158uk")]
+position = Vector2(199, 200)

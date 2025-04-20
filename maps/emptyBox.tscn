@@ -1,0 +1,62 @@
+[gd_scene load_steps=3 format=3 uid="uid://c5iy3t6x15rab"]
+
+[ext_resource type="Texture2D" uid="uid://b7hvdmwtkiujx" path="res://maps/O8WNFY0.jpg" id="1_pof2m"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8rmjr"]
+size = Vector2(1127.24, 20)
+
+[node name="EmptyBox" type="Node2D"]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+position = Vector2(473, 11)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(114.619, 0)
+shape = SubResource("RectangleShape2D_8rmjr")
+
+[node name="Sprite2D" type="Sprite2D" parent="StaticBody2D"]
+position = Vector2(115.5, -0.5)
+scale = Vector2(0.868462, 0.0164448)
+texture = ExtResource("1_pof2m")
+
+[node name="StaticBody2D2" type="StaticBody2D" parent="."]
+position = Vector2(233, 221)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D2"]
+position = Vector2(333, 413)
+shape = SubResource("RectangleShape2D_8rmjr")
+
+[node name="Sprite2D" type="Sprite2D" parent="StaticBody2D2"]
+position = Vector2(344, 415)
+scale = Vector2(0.850769, 0.018794)
+texture = ExtResource("1_pof2m")
+
+[node name="StaticBody2D3" type="StaticBody2D" parent="."]
+position = Vector2(453, 182)
+scale = Vector2(1.14014, 0.650191)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D3"]
+position = Vector2(603.435, 316.83)
+rotation = 1.5708
+shape = SubResource("RectangleShape2D_8rmjr")
+
+[node name="Sprite2D" type="Sprite2D" parent="StaticBody2D3"]
+position = Vector2(603.922, 234.07)
+rotation = 1.5708
+scale = Vector2(0.740293, 0.0162735)
+texture = ExtResource("1_pof2m")
+
+[node name="StaticBody2D4" type="StaticBody2D" parent="."]
+position = Vector2(33, 108)
+scale = Vector2(1.14014, 0.650191)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D4"]
+position = Vector2(-18.4188, 315.292)
+rotation = 1.5708
+shape = SubResource("RectangleShape2D_8rmjr")
+
+[node name="Sprite2D" type="Sprite2D" parent="StaticBody2D4"]
+position = Vector2(-18.1271, 331.876)
+rotation = 1.5708
+scale = Vector2(0.765391, 0.0165785)
+texture = ExtResource("1_pof2m")
