@@ -1,15 +1,17 @@
-using System.Collections.Generic;
 using Godot;
+using System.Collections.Generic;
 
 public partial class PlayerTank : CharacterBody2D
 {
 	[Export] public float MoveSpeed = 300f;
 	[Export] public float RotateSpeed = 1.5f;
 	
-	private Dictionary<string, float> currentInput = new();
+	private Godot.Collections.Dictionary<string, float> currentInput = new();
 
 	public override void _PhysicsProcess(double delta)
 	{
+		GD.Print("PlayerTask physics process.");
+		
 		if (IsMultiplayerAuthority())
 		{
 			var direction = new Vector2(0, -1).Rotated(Rotation);
@@ -20,9 +22,11 @@ public partial class PlayerTank : CharacterBody2D
 			
 			Rpc(nameof(UpdateState), Position, Rotation);
 		}
+		
+		GD.Print("PlayerTask physics processed.");
 	}
 
-	public void ApplyInput(Dictionary<string, float> input)
+	public void ApplyInput(Godot.Collections.Dictionary<string, float> input)
 	{
 		currentInput = input;
 	}
@@ -30,10 +34,14 @@ public partial class PlayerTank : CharacterBody2D
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
 	private void UpdateState(Vector2 position, float rotation)
 	{
+		GD.Print($"UpdateState: {position}, {rotation}");
+		
 		if (!IsMultiplayerAuthority())
 		{
 			Position = Position.Lerp(position, 0.2f);
 			Rotation = Mathf.LerpAngle(Rotation, rotation, 0.2f);
+			
+			GD.Print($"Updated: {position}, {rotation}");
 		}
 	}
 }

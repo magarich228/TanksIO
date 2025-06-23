@@ -7,7 +7,7 @@ public partial class Client : Node
 
 	public override void _EnterTree()
 	{
-		GetTree().SetMultiplayer(MultiplayerApi.CreateDefaultInterface(), this.GetPath());
+		// GetTree().SetMultiplayer(mu, this.GetPath());
 		
 		base._EnterTree();
 	}
@@ -21,7 +21,7 @@ public partial class Client : Node
 
 		if (result != Error.Ok)
 		{
-			GD.PrintErr("Failed to create client");
+			GD.PrintErr($"Failed to create client: {result}");
 		}
 
 		Multiplayer.MultiplayerPeer = multiplayer;

@@ -3,20 +3,23 @@ using System;
 
 public partial class Main : Node2D
 {
-	public string ServerEnvironment = "tanksio_server";
-	
-	private PackedScene serverScene = ResourceLoader.Load<PackedScene>("res://server/Server.tscn");
-	private PackedScene clientScene = ResourceLoader.Load<PackedScene>("res://client/Client.tscn");
+	public const string ServerEnvironment = "tanksio_server";
 	
 	public override void _Ready()
 	{
-		bool isServer = OS.HasEnvironment(ServerEnvironment);
+		bool isServer = OS.HasEnvironment(ServerEnvironment) || OS.HasFeature(ServerEnvironment);
 
 		GD.Print($"{ServerEnvironment}: {isServer}");
 		
 		Node node = isServer ? 
-			serverScene.Instantiate() : 
-			clientScene.Instantiate();
+			ResourceLoader.Load<PackedScene>("res://server/Server.tscn").Instantiate() : 
+			ResourceLoader.Load<PackedScene>("res://client/Client.tscn").Instantiate();
+
+		if (!isServer)
+		{
+			var clientPlayer = ResourceLoader.Load<PackedScene>("res://client/player/Player.tscn");
+			AddChild(clientPlayer.Instantiate());
+		}
 		
 		AddChild(node);
 	}
