@@ -3,19 +3,24 @@ using Godot.Collections;
 
 public partial class ClientPlayer : CharacterBody2D
 {
-	private Server server;
+	private NetworkManager networkManager;
 	
-	public override void _Ready()
+	public override void _EnterTree()
 	{
-		this.server = ResourceLoader.Load<PackedScene>("res://server/Server.tscn").Instantiate<Server>();
-		AddChild(this.server);
+		this.networkManager = GetNode<NetworkManager>("/root/NetworkManager");
+		
+		base._EnterTree();
 	}
-	
+
 	public override void _PhysicsProcess(double delta)
 	{
 		GD.Print("Client player physics process.");
 		
-		if (!Multiplayer.IsServer() || Multiplayer.GetUniqueId() != 1)
+		if (Multiplayer.MultiplayerPeer != null 
+			// && 
+			// (!Multiplayer.IsServer() || 
+			// Multiplayer.GetUniqueId() != 1)
+			)
 		{
 			var connectionStatus = Multiplayer.MultiplayerPeer.GetConnectionStatus();
 
@@ -31,13 +36,14 @@ public partial class ClientPlayer : CharacterBody2D
 				["rotate"] = Input.GetAxis("rotate_left", "rotate_right")
 			};
 			
-			this.server.RpcId(1, nameof(Server.ReceiveInput), input);
+			networkManager.RpcId(1, nameof(NetworkManager.ReceiveInput), input);
+			
 			GD.Print("Receive input sended.");
 		}
 	}
 	
 	[Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-	private void UpdateState(Vector2 position, float rotation)
+	public void UpdateState(Vector2 position, float rotation)
 	{
 		Position = this.Position.Lerp(position, 0.2f);
 		Rotation = Mathf.LerpAngle(this.Rotation, rotation, 0.2f);

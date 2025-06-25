@@ -14,11 +14,11 @@ public partial class Server : Node
 
 	public override void _EnterTree()
 	{
-		isServer = OS.HasFeature(Main.ServerEnvironment);
+		isServer = GetParent<Main>().IsServer;
 		GD.Print($"Server isServer: {isServer}");
 		
-		if (isServer)
-			GetTree().SetMultiplayer(MultiplayerApi.CreateDefaultInterface(), this.GetPath());
+		if (isServer){
+			GetTree().SetMultiplayer(MultiplayerApi.CreateDefaultInterface(), this.GetPath());}
 		
 		base._EnterTree();
 	}
@@ -44,6 +44,8 @@ public partial class Server : Node
 		Multiplayer.PeerConnected += MultiplayerOnPeerConnected;
 		Multiplayer.PeerDisconnected += MultiplayerOnPeerDisconnected;
 
+		GetTree().SetMultiplayer(Multiplayer);
+		
 		GD.Print(Multiplayer.MultiplayerPeer.TransferMode.ToString());
 	}
 
@@ -92,7 +94,7 @@ public partial class Server : Node
 		}
 	}
 	
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+	// [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
 	public void ReceiveInput(Dictionary<string, float> input)
 	{
 		GD.Print($"InputLength: {input.Count}");

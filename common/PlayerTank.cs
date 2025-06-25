@@ -12,7 +12,7 @@ public partial class PlayerTank : CharacterBody2D
 	{
 		GD.Print("PlayerTask physics process.");
 		
-		if (IsMultiplayerAuthority())
+		if (Multiplayer.IsServer())
 		{
 			var direction = new Vector2(0, -1).Rotated(Rotation);
 			Velocity = direction * currentInput.GetValueOrDefault("move", 0f) * MoveSpeed;
@@ -31,7 +31,7 @@ public partial class PlayerTank : CharacterBody2D
 		currentInput = input;
 	}
 
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
 	private void UpdateState(Vector2 position, float rotation)
 	{
 		GD.Print($"UpdateState: {position}, {rotation}");
