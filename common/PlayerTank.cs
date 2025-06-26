@@ -1,29 +1,64 @@
 using Godot;
-using System.Collections.Generic;
+using Godot.Collections;
 
 public partial class PlayerTank : CharacterBody2D
 {
 	[Export] public float MoveSpeed = 300f;
 	[Export] public float RotateSpeed = 1.5f;
-	
+
 	private Godot.Collections.Dictionary<string, float> currentInput = new();
+
+	private NetworkManager networkManager;
+
+	public override void _EnterTree()
+	{
+		this.networkManager = GetNode<NetworkManager>("/root/NetworkManager");
+
+		base._EnterTree();
+	}
 
 	public override void _PhysicsProcess(double delta)
 	{
-		GD.Print("PlayerTask physics process.");
-		
 		if (Multiplayer.IsServer())
 		{
+			GD.Print("Server PlayerTank physics process.");
+			
 			var direction = new Vector2(0, -1).Rotated(Rotation);
-			Velocity = direction * currentInput.GetValueOrDefault("move", 0f) * MoveSpeed;
-			Rotation += currentInput.GetValueOrDefault("rotate", 0f) * RotateSpeed * (float)delta;
+
+			currentInput.TryGetValue("move", out var move);
+			currentInput.TryGetValue("rotate", out var rotate);
 			
+			Velocity = direction * move * MoveSpeed;
+			Rotation += rotate * RotateSpeed * (float) delta;
+
 			MoveAndSlide();
-			
+
 			Rpc(nameof(UpdateState), Position, Rotation);
+			
+			GD.Print("Server PlayerTank physics processed.");
 		}
-		
-		GD.Print("PlayerTask physics processed.");
+		else
+		{
+			GD.Print("client player physics process.");
+			
+			var connectionStatus = Multiplayer.MultiplayerPeer.GetConnectionStatus();
+
+			if (connectionStatus != MultiplayerPeer.ConnectionStatus.Connected)
+			{
+				GD.Print($"Connection status: {connectionStatus}");
+				return;
+			}
+
+			var input = new Dictionary<string, float>
+			{
+				["move"] = Input.GetAxis("move_backward", "move_forward"),
+				["rotate"] = Input.GetAxis("rotate_left", "rotate_right")
+			};
+
+			networkManager.RpcId(1, nameof(NetworkManager.ReceiveInput), input);
+
+			GD.Print("Receive input sended.");
+		}
 	}
 
 	public void ApplyInput(Godot.Collections.Dictionary<string, float> input)
@@ -35,12 +70,12 @@ public partial class PlayerTank : CharacterBody2D
 	private void UpdateState(Vector2 position, float rotation)
 	{
 		GD.Print($"UpdateState: {position}, {rotation}");
-		
-		if (!IsMultiplayerAuthority())
+
+		if (!Multiplayer.IsServer())
 		{
 			Position = Position.Lerp(position, 0.2f);
 			Rotation = Mathf.LerpAngle(Rotation, rotation, 0.2f);
-			
+
 			GD.Print($"Updated: {position}, {rotation}");
 		}
 	}
