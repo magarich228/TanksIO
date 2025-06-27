@@ -1,11 +1,10 @@
 using Godot;
 using Godot.Collections;
 
-// TODO: пофиксить игру при нескольких игроках
 public partial class PlayerTank : CharacterBody2D
 {
-	[Export] public float MoveSpeed = 300f;
-	[Export] public float RotateSpeed = 1.5f;
+	[Export] public float MoveSpeed = 150f;
+	[Export] public float RotateSpeed = 3.0f;
 
 	private Dictionary<string, float> currentInput = new();
 
@@ -22,8 +21,6 @@ public partial class PlayerTank : CharacterBody2D
 	{
 		if (Multiplayer.IsServer())
 		{
-			GD.Print("Server PlayerTank physics process.");
-			
 			var direction = new Vector2(0, -1).Rotated(Rotation);
 
 			currentInput.TryGetValue("move", out var move);
@@ -33,15 +30,9 @@ public partial class PlayerTank : CharacterBody2D
 			Rotation += rotate * RotateSpeed * (float) delta;
 
 			MoveAndSlide();
-
-			Rpc(nameof(UpdateState), Position, Rotation);
-			
-			GD.Print("Server PlayerTank physics processed.");
 		}
 		else
 		{
-			GD.Print("client player physics process.");
-			
 			var connectionStatus = Multiplayer.MultiplayerPeer.GetConnectionStatus();
 
 			if (connectionStatus != MultiplayerPeer.ConnectionStatus.Connected)
@@ -57,8 +48,6 @@ public partial class PlayerTank : CharacterBody2D
 			};
 
 			networkManager.RpcId(1, nameof(NetworkManager.ReceiveInput), input);
-
-			GD.Print("Receive input sended.");
 		}
 	}
 
@@ -67,18 +56,12 @@ public partial class PlayerTank : CharacterBody2D
 		currentInput = input;
 	}
 
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-	private void UpdateState(Vector2 position, float rotation)
+	public void UpdateState(Vector2 position, float rotation)
 	{
-		GD.Print($"UpdateState: {position}, {rotation}");
-
 		if (!Multiplayer.IsServer())
 		{
 			Position = Position.Lerp(position, 0.2f);
 			Rotation = Mathf.LerpAngle(Rotation, rotation, 0.2f);
-
-			this.networkManager.ResetTimeout();
-			GD.Print($"Updated: {position}, {rotation}");
 		}
 	}
 }

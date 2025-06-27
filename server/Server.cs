@@ -10,7 +10,9 @@ public partial class Server : Node
 	private PackedScene TankScene = ResourceLoader.Load<PackedScene>("res://common/PlayerTank.tscn");
 
 	private bool isServer;
-	private readonly Dictionary<int, Node2D> tanks = new();
+	private readonly Dictionary<int, PlayerTank> tanks = new();
+	
+	private NetworkManager networkManager;
 
 	public override void _EnterTree()
 	{
@@ -20,10 +22,31 @@ public partial class Server : Node
 		if (isServer){
 			GetTree().SetMultiplayer(MultiplayerApi.CreateDefaultInterface(), this.GetPath());}
 		
+		networkManager = GetNode<NetworkManager>("/root/NetworkManager");
+		
 		base._EnterTree();
 	}
 
 	public override void _Ready() => Host(this.Port); // Configuration load
+
+	public override void _Process(double delta)
+	{
+		var positions = new Dictionary<int, Vector2>();
+		var rotations = new Dictionary<int, float>();
+
+		foreach (var tank in tanks)
+		{
+			positions.Add(tank.Key, tank.Value.Position);
+			rotations.Add(tank.Key, tank.Value.Rotation);
+		}
+		
+		networkManager.Rpc(
+			nameof(NetworkManager.UpdateGameState),
+			positions,
+			rotations);
+		
+		base._Process(delta);
+	}
 
 	private void Host(int port)
 	{
@@ -63,7 +86,7 @@ public partial class Server : Node
 	
 	private void SpawnTank(int peerId)
 	{
-		var tank = TankScene.Instantiate<Node2D>();
+		var tank = TankScene.Instantiate<PlayerTank>();
 		GD.Print($"SpawnTank {peerId}");
 		
 		tank.Name = $"Tank_{peerId}";
@@ -94,17 +117,13 @@ public partial class Server : Node
 		}
 	}
 	
-	// [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
 	public void ReceiveInput(Dictionary<string, float> input)
 	{
-		GD.Print($"InputLength: {input.Count}");
 		int peerId = Multiplayer.GetRemoteSenderId();
 		
 		if (tanks.TryGetValue(peerId, out var tankNode))
 		{
-			 var tank = tankNode.GetNode<PlayerTank>("CharacterBody2D");
-			 GD.Print($"tank received. {tank is not null}");
-			 tank.ApplyInput(input);
+			tankNode.ApplyInput(input);
 		}
 	}
 }

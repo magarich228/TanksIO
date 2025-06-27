@@ -1,4 +1,6 @@
+using System;
 using Godot;
+using Godot.Collections;
 
 public partial class NetworkManager : Node
 {
@@ -13,6 +15,7 @@ public partial class NetworkManager : Node
 	private float _currentPing;
 	
 	public bool IsServerConnected { get; private set; }
+	public event Action<Dictionary<int, Vector2>, Dictionary<int, float>> OnUpdateGameState; 
 
 	public override void _Ready()
 	{
@@ -89,8 +92,14 @@ public partial class NetworkManager : Node
 		}
 	}
 	
+	[Rpc(CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+	public void UpdateGameState(Dictionary<int, Vector2> positions, Dictionary<int, float> rotations)
+	{
+		OnUpdateGameState?.Invoke(positions, rotations);
+	}
+	
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-	public void ReceiveInput(Godot.Collections.Dictionary<string, float> input)
+	public void ReceiveInput(Dictionary<string, float> input)
 	{
 		if (Multiplayer.IsServer())
 		{

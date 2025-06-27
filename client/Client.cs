@@ -1,5 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
 using Godot;
-using Godot.Collections;
 
 public partial class Client : Node
 {
@@ -8,13 +9,46 @@ public partial class Client : Node
 	
 	[Export] 
 	private PackedScene TankScene = ResourceLoader.Load<PackedScene>("res://common/PlayerTank.tscn");
-	private readonly Dictionary<int, Node2D> tanks = new();
+	private readonly Godot.Collections.Dictionary<int, PlayerTank> tanks = new();
+	
+	private NetworkManager networkManager;
+	private readonly List<int> processedTanks = new();
 
 	public override void _EnterTree()
 	{
 		// GetTree().SetMultiplayer(mu, this.GetPath());
 		
+		networkManager = GetNode<NetworkManager>("/root/NetworkManager");
+		networkManager.OnUpdateGameState += OnUpdateGameState;
+		
 		base._EnterTree();
+	}
+
+	private void OnUpdateGameState(Godot.Collections.Dictionary<int, Vector2> tankPositions, Godot.Collections.Dictionary<int, float> rotations)
+	{
+		this.networkManager.ResetTimeout();
+		
+		foreach (var tankPosition in tankPositions)
+		{
+			if (tanks.TryGetValue(tankPosition.Key, out var tankNode))
+			{
+				tankNode.UpdateState(tankPosition.Value, rotations[tankPosition.Key]);
+			}
+			else
+			{
+				SpawnTank(tankPosition.Key, tankPosition.Value, rotations[tankPosition.Key]);
+			}
+			
+			processedTanks.Add(tankPosition.Key);
+		}
+
+		foreach (var tankToDespawn in tanks.Select(t => t.Key)
+					 .Except(processedTanks))
+		{
+			DespawnTank(tankToDespawn);
+		}
+		
+		processedTanks.Clear();
 	}
 
 	public override void _Ready() => Join("127.0.0.1", Port);
@@ -54,9 +88,12 @@ public partial class Client : Node
 		SpawnTank(Multiplayer.GetUniqueId());
 	}
 	
-	private void SpawnTank(int peerId)
+	private void SpawnTank(int peerId, Vector2? position = null, float? rotation = null)
 	{
-		var tank = TankScene.Instantiate<Node2D>();
+		if (tanks.ContainsKey(peerId))
+			return;
+		
+		var tank = TankScene.Instantiate<PlayerTank>();
 		GD.Print($"SpawnTank {peerId}");
 		
 		tank.Name = $"Tank_{peerId}";
@@ -70,6 +107,16 @@ public partial class Client : Node
 			.AddChild(tank); // TODO: Map вместо Конкретной карты
 		
 		GD.Print("Tank added.");
+
+		if (position.HasValue)
+		{
+			tank.Position = position.Value;
+		}
+
+		if (rotation.HasValue)
+		{
+			tank.Rotation = rotation.Value;
+		}
 		
 		tanks[peerId] = tank;
 	}
