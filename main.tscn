@@ -7,3 +7,11 @@
 script = ExtResource("1_7bi66")
 
 [node name="EmptyBox" parent="." instance=ExtResource("1_w45ip")]
+
+[node name="UI" type="Node2D" parent="."]
+
+[node name="PingLabel" type="Label" parent="UI"]
+offset_left = 966.0
+offset_top = 62.0
+offset_right = 1006.0
+offset_bottom = 85.0

@@ -39,6 +39,13 @@ public partial class Client : Node
 	{
 		GD.Print($"Peer {id} disconnected (client {Multiplayer.GetUniqueId()})");
 		DespawnTank(Multiplayer.GetUniqueId());
+
+		foreach (var tank in this.tanks)
+		{
+			DespawnTank(tank.Key);
+		}
+		
+		GetTree().SetMultiplayer(null);
 	}
 
 	private void MultiplayerOnPeerConnected(long id)

@@ -1,12 +1,13 @@
 using Godot;
 using Godot.Collections;
 
+// TODO: пофиксить игру при нескольких игроках
 public partial class PlayerTank : CharacterBody2D
 {
 	[Export] public float MoveSpeed = 300f;
 	[Export] public float RotateSpeed = 1.5f;
 
-	private Godot.Collections.Dictionary<string, float> currentInput = new();
+	private Dictionary<string, float> currentInput = new();
 
 	private NetworkManager networkManager;
 
@@ -61,7 +62,7 @@ public partial class PlayerTank : CharacterBody2D
 		}
 	}
 
-	public void ApplyInput(Godot.Collections.Dictionary<string, float> input)
+	public void ApplyInput(Dictionary<string, float> input)
 	{
 		currentInput = input;
 	}
@@ -76,6 +77,7 @@ public partial class PlayerTank : CharacterBody2D
 			Position = Position.Lerp(position, 0.2f);
 			Rotation = Mathf.LerpAngle(Rotation, rotation, 0.2f);
 
+			this.networkManager.ResetTimeout();
 			GD.Print($"Updated: {position}, {rotation}");
 		}
 	}
