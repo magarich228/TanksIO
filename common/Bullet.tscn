@@ -3,15 +3,16 @@
 [ext_resource type="Script" path="res://common/Bullet.cs" id="1_2coeu"]
 [ext_resource type="Texture2D" uid="uid://dbpgdgfxstqht" path="res://icon.svg" id="2_dq5nt"]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_qccid"]
+[sub_resource type="CircleShape2D" id="CircleShape2D_qso45"]
+radius = 13.1762
 
 [node name="Bullet" type="RigidBody2D"]
-scale = Vector2(0.263526, 0.400419)
 script = ExtResource("1_2coeu")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("CapsuleShape2D_qccid")
+scale = Vector2(0.465882, 0.439999)
+shape = SubResource("CircleShape2D_qso45")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-scale = Vector2(0.159999, 0.249609)
+scale = Vector2(0.101749, 0.0896088)
 texture = ExtResource("2_dq5nt")

@@ -97,14 +97,15 @@ public partial class PlayerTank : CharacterBody2D
 		if (_bulletScene == null) return;
 		
 		var bullet = _bulletScene.Instantiate<Bullet>();
+		bullet.Name = bullet.GetInstanceId()
+			.ToString();
+		
+		GetParent().AddChild(bullet);
+		
 		Vector2 spawnPos = Position + new Vector2(0, -50).Rotated(Rotation);
 		bullet.Initialize(this, spawnPos, Rotation, _bulletSpeedMultiplier);
-		bullet.Name = $"Bullet_{bullet.GetInstanceId()}";
 		
 		OnShoot?.Invoke(bullet);
-		
-		// Добавляем в мир
-		GetParent().AddChild(bullet);
 		
 		// Сигнал столкновения
 		// bullet.BodyEntered += OnBulletBodyEntered;

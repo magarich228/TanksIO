@@ -1,8 +1,9 @@
 using Godot;
+
 public partial class Bullet : RigidBody2D
 {
 	[Export] public float InitialSpeed = 1000f;
-	[Export] public int MaxBounces = 5;
+	[Export] public int MaxBounces = 50;
 	[Export] public float LifeTime = 10f;
 	
 	private int _bouncesLeft;
@@ -11,12 +12,26 @@ public partial class Bullet : RigidBody2D
 	
 	public PlayerTank Player { get; set; }
 	
+	public override void _Ready()
+	{
+		// Создаем и настраиваем таймер
+		_lifeTimer = new Timer
+		{
+			WaitTime = LifeTime,
+			OneShot = true
+		};
+		
+		GravityScale = 0f;
+		
+		AddChild(_lifeTimer);
+		_lifeTimer.Timeout += OnLifeTimeEnded;
+	}
+	
 	public void Initialize(PlayerTank playerTank, Vector2 position, float rotation, float speedMultiplier = 1.0f)
 	{
 		Player = playerTank;
 		Position = position;
 		Rotation = rotation;
-		GravityScale = 0f;
 		
 		_bouncesLeft = MaxBounces;
 		_hasHit = false;
@@ -32,17 +47,16 @@ public partial class Bullet : RigidBody2D
 			Rough = false
 		};
 		
-		// Таймер времени жизни
-		_lifeTimer = new Timer
+		// Запускаем таймер только если он добавлен в дерево
+		if (_lifeTimer != null && !_lifeTimer.IsStopped())
 		{
-			WaitTime = LifeTime,
-			OneShot = true
-		};
+			_lifeTimer.Stop();
+		}
 		
-		AddChild(_lifeTimer);
-		
-		_lifeTimer.Timeout += OnLifeTimeEnded;
-		_lifeTimer.Start();
+		if (_lifeTimer != null)
+		{
+			_lifeTimer.Start();
+		}
 	}
 
 	private void OnBodyEntered(Node body)

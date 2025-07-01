@@ -44,8 +44,8 @@ public partial class Server : Node
 		}
 
 		foreach (var bullet in GetNode<Node2D>("/root/Main/EmptyBox")
-					 .FindChildren("Bullet_")
-					 .Cast<Bullet>())
+					 .GetChildren()
+					 .OfType<Bullet>())
 		{
 			var id = bullet.GetInstanceId();
 			

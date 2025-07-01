@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Godot;
 
 public partial class Client : Node
@@ -9,10 +10,51 @@ public partial class Client : Node
 	
 	[Export] 
 	private PackedScene TankScene = ResourceLoader.Load<PackedScene>("res://common/PlayerTank.tscn");
+	
+	[Export]
+	private PackedScene BulletScene = ResourceLoader.Load<PackedScene>("res://common/Bullet.tscn");
+	
 	private readonly Godot.Collections.Dictionary<int, PlayerTank> tanks = new();
 	
 	private NetworkManager networkManager;
 	private readonly List<int> processedTanks = new();
+
+	private double timer;
+	public override void _Process(double delta)
+	{
+		timer += delta;
+
+		if (timer > 1.0)
+		{
+			var bullets = GetNode<Node2D>("/root/Main/EmptyBox")
+				.GetChildren()
+				.OfType<Bullet>();
+			
+			GD.Print($"Bullets: {bullets.Count()}"); // TODO: Remove;
+			
+			timer = 0;
+		}
+
+		if (Input.IsActionJustPressed("ui_accept"))
+		{
+			var sb = new StringBuilder();
+			PrintNode(GetNode<Node>("/root/Main"), 0);
+
+			GD.Print(sb.ToString());
+			
+			void PrintNode(Node node, int subLevel)
+			{
+				sb.AppendLine(new string(' ', subLevel) + node.Name);
+				
+				foreach (var child in node.GetChildren())
+				{
+					PrintNode(child, subLevel + 1);
+				}
+			}
+		}
+		
+		base._Process(delta);
+	}
 
 	public override void _EnterTree()
 	{
@@ -58,26 +100,27 @@ public partial class Client : Node
 		{
 			var id = bulletPosition.Key;
 
-			var bullet = GetNodeOrNull<Bullet>($"/root/Main/EmptyBox/Bullet_{id}");
+			var bullet = GetNodeOrNull<Bullet>($"/root/Main/EmptyBox/{id}");
 
 			if (bullet == null)
 			{
-				bullet = new Bullet();
+				bullet = BulletScene.Instantiate<Bullet>();
+				bullet.Freeze = true;
+				bullet.Name = id.ToString();
+				
 				map.AddChild(bullet);
-				bullet.Name = $"Bullet_{id}";
 			}
-			
+
 			bullet.Position = bulletPosition.Value;
 			bullet.Rotation = bulletRotations[id];
 		}
 		
-		foreach (var bulletToDespawn in map
-					 .FindChildren("Bullet_")
-					 .Cast<Bullet>()
-					 .Select(b => b.GetInstanceId())
+		foreach (var bulletToDespawn in map.GetChildren()
+					 .OfType<Bullet>()
+					 .Select(b => ulong.Parse(b.Name))
 					 .Except(bulletPositions.Keys))
 		{
-			GetNode<Bullet>($"/root/Main/EmptyBox/Bullet_{bulletToDespawn}")
+			GetNode<Bullet>($"/root/Main/EmptyBox/{bulletToDespawn}")
 				.QueueFree();
 		}
 		
