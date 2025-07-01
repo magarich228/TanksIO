@@ -105,9 +105,12 @@ public partial class Server : Node
 		GD.Print($"SpawnTank {peerId}");
 		
 		tank.Name = $"Tank_{peerId}";
+		tank.Id = peerId;
 		tank.SetMultiplayerAuthority(peerId);
 
 		tank.Position = new Vector2(200, 200);
+		tank.Killed += OnKilled;
+		
 		GD.Print("Tank configured.");
 		
 		base.GetParent<Node2D>()
@@ -130,6 +133,11 @@ public partial class Server : Node
 			
 			GD.Print($"Despawned: {peerId}");
 		}
+	}
+
+	private void OnKilled(PlayerTank tank)
+	{
+		DespawnTank(tank.Id);
 	}
 	
 	public void ReceiveInput(Dictionary<string, float> input)

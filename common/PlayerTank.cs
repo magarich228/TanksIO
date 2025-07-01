@@ -6,6 +6,10 @@ public partial class PlayerTank : CharacterBody2D
 {
 	[Export] public float MoveSpeed = 150f;
 	[Export] public float RotateSpeed = 3.0f;
+	public int Id { get; set; }
+
+	[Signal]
+	public delegate void KilledEventHandler(PlayerTank tank);
 	
 	public event Action<Bullet> OnShoot;
 
@@ -102,7 +106,7 @@ public partial class PlayerTank : CharacterBody2D
 		
 		GetParent().AddChild(bullet);
 		
-		Vector2 spawnPos = Position + new Vector2(0, -20).Rotated(Rotation);
+		Vector2 spawnPos = Position + new Vector2(0, -30).Rotated(Rotation);
 		bullet.Initialize(this, spawnPos, Rotation, _bulletSpeedMultiplier);
 		
 		OnShoot?.Invoke(bullet);
@@ -116,18 +120,16 @@ public partial class PlayerTank : CharacterBody2D
 	
 	public void TakeDamage(int damage = 0)
 	{
-		// Мгновенная смерть
 		Explode();
 	}
 	
 	private void Explode()
 	{
-		// Создаем эффект взрыва
+		// Эффект взрыва
 		// var explosion = GD.Load<PackedScene>("res://effects/explosion.tscn").Instantiate();
 		// explosion.Position = Position;
 		// GetParent().AddChild(explosion);
-		
-		// Уничтожаем танк
-		QueueFree();
+
+		EmitSignal(SignalName.Killed, this);
 	}
 }

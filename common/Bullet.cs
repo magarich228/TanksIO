@@ -23,6 +23,8 @@ public partial class Bullet : RigidBody2D
 		};
 		
 		GravityScale = 0f;
+		ContactMonitor = true;
+		MaxContactsReported = 5;
 		
 		AddChild(_lifeTimer);
 		_lifeTimer.Timeout += OnLifeTimeEnded;
@@ -40,6 +42,18 @@ public partial class Bullet : RigidBody2D
 		state.LinearVelocity = _direction * _currentSpeed;
 		
 		base._IntegrateForces(state);
+	}
+
+	public override void _PhysicsProcess(double delta)
+	{
+		var collidingBodies = GetCollidingBodies();
+
+		foreach (var body in collidingBodies)
+		{
+			OnBodyEntered(body);
+		}
+		
+		base._PhysicsProcess(delta);
 	}
 
 	public void Initialize(PlayerTank playerTank, Vector2 position, float rotation, float speedMultiplier = 1.0f)
@@ -73,7 +87,12 @@ public partial class Bullet : RigidBody2D
 
 	private void OnBodyEntered(Node body)
 	{
-		if (_hasHit) return;
+		GD.Print($"Bullet hit {body.Name} ({body.GetType()})");
+		
+		if (_hasHit) 
+			return;
+		
+		GD.Print("Does not return");
 		
 		if (body is PlayerTank tank)
 		{

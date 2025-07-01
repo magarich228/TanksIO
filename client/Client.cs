@@ -173,6 +173,7 @@ public partial class Client : Node
 		GD.Print($"SpawnTank {peerId}");
 		
 		tank.Name = $"Tank_{peerId}";
+		tank.Id = peerId;
 		tank.SetMultiplayerAuthority(peerId);
 
 		tank.Position = new Vector2(200, 200);
