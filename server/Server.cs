@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Immutable;
 using System.Linq;
 using Godot;
 using Godot.Collections;
@@ -108,14 +110,27 @@ public partial class Server : Node
 		tank.Id = peerId;
 		tank.SetMultiplayerAuthority(peerId);
 
-		tank.Position = new Vector2(200, 200);
+		var map = GetParent<Node2D>()
+			.GetNode<Node2D>("Map");
+
+		var spawns = map.GetNode<Node2D>("Spawns")
+			.GetChildren()
+			.OfType<Spawn>()
+			.ToImmutableArray();
+
+		Spawn spawn;
+		
+		do
+		{
+			spawn = spawns[Random.Shared.Next(spawns.Length)];
+		} while (spawn.IsOccupied);
+		
+		tank.Position = spawn.Position;
 		tank.Killed += OnKilled;
 		
 		GD.Print("Tank configured.");
-		
-		base.GetParent<Node2D>()
-			.GetNode<Node2D>("Map")
-			.AddChild(tank);
+
+		map.AddChild(tank);
 		
 		GD.Print("Tank added.");
 		
