@@ -2,13 +2,15 @@ using Godot;
 
 public partial class Bullet : RigidBody2D
 {
-	[Export] public float InitialSpeed = 1000f;
+	[Export] public float InitialSpeed = 250f;
 	[Export] public int MaxBounces = 50;
 	[Export] public float LifeTime = 10f;
 	
 	private int _bouncesLeft;
 	private Timer _lifeTimer;
 	private bool _hasHit;
+	private Vector2 _direction;
+	private float _currentSpeed;
 	
 	public PlayerTank Player { get; set; }
 	
@@ -26,7 +28,21 @@ public partial class Bullet : RigidBody2D
 		AddChild(_lifeTimer);
 		_lifeTimer.Timeout += OnLifeTimeEnded;
 	}
-	
+
+	public override void _IntegrateForces(PhysicsDirectBodyState2D state)
+	{
+		if (_hasHit) return;
+		
+		if (state.LinearVelocity.LengthSquared() > 0)
+		{
+			_direction = state.LinearVelocity.Normalized();
+		}
+		
+		state.LinearVelocity = _direction * _currentSpeed;
+		
+		base._IntegrateForces(state);
+	}
+
 	public void Initialize(PlayerTank playerTank, Vector2 position, float rotation, float speedMultiplier = 1.0f)
 	{
 		Player = playerTank;
@@ -36,35 +52,30 @@ public partial class Bullet : RigidBody2D
 		_bouncesLeft = MaxBounces;
 		_hasHit = false;
 		
-		// Направление и скорость
-		Vector2 direction = new Vector2(0, -1).Rotated(rotation);
-		LinearVelocity = direction * InitialSpeed * speedMultiplier;
+		_direction = new Vector2(0, -1).Rotated(rotation);
+		_currentSpeed = InitialSpeed * speedMultiplier;
+		LinearVelocity = _direction * _currentSpeed;
 		
-		// Настройка физики для отскоков
 		PhysicsMaterialOverride = new PhysicsMaterial
 		{
 			Bounce = 0.8f,
-			Rough = false
+			Rough = false,
+			Friction = 0f
 		};
-		
-		// Запускаем таймер только если он добавлен в дерево
-		if (_lifeTimer != null && !_lifeTimer.IsStopped())
-		{
-			_lifeTimer.Stop();
-		}
 		
 		if (_lifeTimer != null)
 		{
+			if (!_lifeTimer.IsStopped())
+				_lifeTimer.Stop();
+				
 			_lifeTimer.Start();
 		}
 	}
 
 	private void OnBodyEntered(Node body)
 	{
-		// Проверка, что пуля еще активна
 		if (_hasHit) return;
 		
-		// Обработка попадания в танк
 		if (body is PlayerTank tank)
 		{
 			tank.TakeDamage();
@@ -74,7 +85,6 @@ public partial class Bullet : RigidBody2D
 			return;
 		}
 		
-		// Обработка отскока от стены
 		if (body is StaticBody2D)
 		{
 			_bouncesLeft--;

@@ -102,7 +102,7 @@ public partial class PlayerTank : CharacterBody2D
 		
 		GetParent().AddChild(bullet);
 		
-		Vector2 spawnPos = Position + new Vector2(0, -50).Rotated(Rotation);
+		Vector2 spawnPos = Position + new Vector2(0, -20).Rotated(Rotation);
 		bullet.Initialize(this, spawnPos, Rotation, _bulletSpeedMultiplier);
 		
 		OnShoot?.Invoke(bullet);
