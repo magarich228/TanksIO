@@ -153,6 +153,8 @@ public partial class Server : Node
 	private void OnKilled(PlayerTank tank)
 	{
 		DespawnTank(tank.Id);
+		
+		SpawnTank(tank.Id);
 	}
 	
 	public void ReceiveInput(Dictionary<string, float> input)

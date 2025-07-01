@@ -179,10 +179,6 @@ public partial class Client : Node
 		tank.Position = new Vector2(200, 200);
 		GD.Print("Tank configured.");
 		
-		base.GetParent<Node2D>()
-			.GetNode<Node2D>("Map")
-			.AddChild(tank); // TODO: Map вместо Конкретной карты
-		
 		GD.Print("Tank added.");
 
 		if (position.HasValue)
@@ -194,6 +190,10 @@ public partial class Client : Node
 		{
 			tank.Rotation = rotation.Value;
 		}
+		
+		base.GetParent<Node2D>()
+			.GetNode<Node2D>("Map")
+			.AddChild(tank);
 		
 		tanks[peerId] = tank;
 	}
