@@ -51,7 +51,6 @@ public partial class PlayerTank : CharacterBody2D
 
 			if (currentInput.ContainsKey("shoot"))
 			{
-				GD.Print("server shoot");
 				Shoot();
 			}
 

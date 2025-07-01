@@ -43,7 +43,7 @@ public partial class Server : Node
 			rotations.Add(tank.Key, tank.Value.Rotation);
 		}
 
-		foreach (var bullet in GetNode<Node2D>("/root/Main/EmptyBox")
+		foreach (var bullet in GetNode<Node2D>("/root/Main/Map")
 					 .GetChildren()
 					 .OfType<Bullet>())
 		{
@@ -114,8 +114,8 @@ public partial class Server : Node
 		GD.Print("Tank configured.");
 		
 		base.GetParent<Node2D>()
-			.GetNode<Node2D>("EmptyBox")
-			.AddChild(tank); // TODO: Map вместо Конкретной карты
+			.GetNode<Node2D>("Map")
+			.AddChild(tank);
 		
 		GD.Print("Tank added.");
 		

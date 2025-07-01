@@ -87,15 +87,12 @@ public partial class Bullet : RigidBody2D
 
 	private void OnBodyEntered(Node body)
 	{
-		GD.Print($"Bullet hit {body.Name} ({body.GetType()})");
-		
 		if (_hasHit) 
 			return;
 		
-		GD.Print("Does not return");
-		
 		if (body is PlayerTank tank)
 		{
+			GD.Print($"Tank {tank.Id} killed.");
 			tank.TakeDamage();
 			_hasHit = true;
 			// CreateHitEffect();

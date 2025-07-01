@@ -5,7 +5,7 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8rmjr"]
 size = Vector2(1127.24, 20)
 
-[node name="EmptyBox" type="Node2D"]
+[node name="Map" type="Node2D"]
 
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
 position = Vector2(473, 11)

@@ -26,7 +26,7 @@ public partial class Client : Node
 
 		if (timer > 1.0)
 		{
-			var bullets = GetNode<Node2D>("/root/Main/EmptyBox")
+			var bullets = GetNode<Node2D>("/root/Main/Map")
 				.GetChildren()
 				.OfType<Bullet>();
 			
@@ -94,13 +94,13 @@ public partial class Client : Node
 			DespawnTank(tankToDespawn);
 		}
 
-		var map = GetNode<Node2D>("/root/Main/EmptyBox");
+		var map = GetNode<Node2D>("/root/Main/Map");
 		
 		foreach (var bulletPosition in bulletPositions)
 		{
 			var id = bulletPosition.Key;
 
-			var bullet = GetNodeOrNull<Bullet>($"/root/Main/EmptyBox/{id}");
+			var bullet = GetNodeOrNull<Bullet>($"/root/Main/Map/{id}");
 
 			if (bullet == null)
 			{
@@ -120,7 +120,7 @@ public partial class Client : Node
 					 .Select(b => ulong.Parse(b.Name))
 					 .Except(bulletPositions.Keys))
 		{
-			GetNode<Bullet>($"/root/Main/EmptyBox/{bulletToDespawn}")
+			GetNode<Bullet>($"/root/Main/Map/{bulletToDespawn}")
 				.QueueFree();
 		}
 		
@@ -180,7 +180,7 @@ public partial class Client : Node
 		GD.Print("Tank configured.");
 		
 		base.GetParent<Node2D>()
-			.GetNode<Node2D>("EmptyBox")
+			.GetNode<Node2D>("Map")
 			.AddChild(tank); // TODO: Map вместо Конкретной карты
 		
 		GD.Print("Tank added.");
