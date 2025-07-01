@@ -8,4 +8,9 @@
   <ItemGroup>
     <Folder Include="maps\" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="config.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

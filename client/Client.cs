@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Godot;
+using TanksIO;
 
 public partial class Client : Node
 {
@@ -127,7 +128,13 @@ public partial class Client : Node
 		processedTanks.Clear();
 	}
 
-	public override void _Ready() => Join("127.0.0.1", Port);
+	public override void _Ready()
+	{
+		var configuration = new Configuration();
+		configuration.Load();
+		
+		Join(configuration.Host, configuration.Port);
+	}
 
 	public void Join(string host, int port)
 	{

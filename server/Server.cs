@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using Godot;
 using Godot.Collections;
+using TanksIO;
 
 public partial class Server : Node
 {
@@ -30,7 +31,13 @@ public partial class Server : Node
 		base._EnterTree();
 	}
 
-	public override void _Ready() => Host(this.Port); // Configuration load
+	public override void _Ready()
+	{
+		var configuration = new Configuration();
+		configuration.Load();
+		
+		Host(configuration.Port);
+	}
 
 	public override void _Process(double delta)
 	{
