@@ -1,3 +1,4 @@
+using System;
 using Godot;
 using Godot.Collections;
 
@@ -5,10 +6,25 @@ public partial class PlayerTank : CharacterBody2D
 {
 	[Export] public float MoveSpeed = 150f;
 	[Export] public float RotateSpeed = 3.0f;
+	
+	public event Action<Bullet> OnShoot;
 
 	private Dictionary<string, float> currentInput = new();
 
+	[Export] private PackedScene _bulletScene;
+	[Export] private float _fireRate = 0.5f;
+	[Export] private float _bulletSpeedMultiplier = 1.0f;
+	
+	private float _fireCooldown;
+	
 	private NetworkManager networkManager;
+
+	public override void _Ready()
+	{
+		_bulletScene = ResourceLoader.Load<PackedScene>("res://common/Bullet.tscn");
+		
+		base._Ready();
+	}
 
 	public override void _EnterTree()
 	{
@@ -29,6 +45,12 @@ public partial class PlayerTank : CharacterBody2D
 			Velocity = direction * move * MoveSpeed;
 			Rotation += rotate * RotateSpeed * (float) delta;
 
+			if (currentInput.ContainsKey("shoot"))
+			{
+				GD.Print("server shoot");
+				Shoot();
+			}
+
 			MoveAndSlide();
 		}
 		else
@@ -47,6 +69,11 @@ public partial class PlayerTank : CharacterBody2D
 				["rotate"] = Input.GetAxis("rotate_left", "rotate_right")
 			};
 
+			if (Input.IsActionJustPressed("shoot"))
+			{
+				input.Add("shoot", 1.0f);
+			}
+
 			networkManager.RpcId(1, nameof(NetworkManager.ReceiveInput), input);
 		}
 	}
@@ -63,5 +90,43 @@ public partial class PlayerTank : CharacterBody2D
 			Position = Position.Lerp(position, 0.2f);
 			Rotation = Mathf.LerpAngle(Rotation, rotation, 0.2f);
 		}
+	}
+	
+	private void Shoot()
+	{
+		if (_bulletScene == null) return;
+		
+		var bullet = _bulletScene.Instantiate<Bullet>();
+		Vector2 spawnPos = Position + new Vector2(0, -50).Rotated(Rotation);
+		bullet.Initialize(this, spawnPos, Rotation, _bulletSpeedMultiplier);
+		bullet.Name = $"Bullet_{bullet.GetInstanceId()}";
+		
+		OnShoot?.Invoke(bullet);
+		
+		// Добавляем в мир
+		GetParent().AddChild(bullet);
+		
+		// Сигнал столкновения
+		// bullet.BodyEntered += OnBulletBodyEntered;
+		
+		// Звук выстрела
+		// GetNode<AudioStreamPlayer>("ShootSound").Play();
+	}
+	
+	public void TakeDamage(int damage = 0)
+	{
+		// Мгновенная смерть
+		Explode();
+	}
+	
+	private void Explode()
+	{
+		// Создаем эффект взрыва
+		// var explosion = GD.Load<PackedScene>("res://effects/explosion.tscn").Instantiate();
+		// explosion.Position = Position;
+		// GetParent().AddChild(explosion);
+		
+		// Уничтожаем танк
+		QueueFree();
 	}
 }

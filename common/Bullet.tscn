@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3 uid="uid://dkmifcdm04hhv"]
+
+[ext_resource type="Script" path="res://common/Bullet.cs" id="1_2coeu"]
+[ext_resource type="Texture2D" uid="uid://dbpgdgfxstqht" path="res://icon.svg" id="2_dq5nt"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_qccid"]
+
+[node name="Bullet" type="RigidBody2D"]
+scale = Vector2(0.263526, 0.400419)
+script = ExtResource("1_2coeu")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CapsuleShape2D_qccid")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.159999, 0.249609)
+texture = ExtResource("2_dq5nt")

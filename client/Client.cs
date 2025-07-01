@@ -24,7 +24,11 @@ public partial class Client : Node
 		base._EnterTree();
 	}
 
-	private void OnUpdateGameState(Godot.Collections.Dictionary<int, Vector2> tankPositions, Godot.Collections.Dictionary<int, float> rotations)
+	private void OnUpdateGameState(
+		Godot.Collections.Dictionary<int, Vector2> tankPositions, 
+		Godot.Collections.Dictionary<int, float> tankRotations, 
+		Godot.Collections.Dictionary<ulong, Vector2> bulletPositions, 
+		Godot.Collections.Dictionary<ulong, float> bulletRotations)
 	{
 		this.networkManager.ResetTimeout();
 		
@@ -32,11 +36,11 @@ public partial class Client : Node
 		{
 			if (tanks.TryGetValue(tankPosition.Key, out var tankNode))
 			{
-				tankNode.UpdateState(tankPosition.Value, rotations[tankPosition.Key]);
+				tankNode.UpdateState(tankPosition.Value, tankRotations[tankPosition.Key]);
 			}
 			else
 			{
-				SpawnTank(tankPosition.Key, tankPosition.Value, rotations[tankPosition.Key]);
+				SpawnTank(tankPosition.Key, tankPosition.Value, tankRotations[tankPosition.Key]);
 			}
 			
 			processedTanks.Add(tankPosition.Key);
@@ -46,6 +50,35 @@ public partial class Client : Node
 					 .Except(processedTanks))
 		{
 			DespawnTank(tankToDespawn);
+		}
+
+		var map = GetNode<Node2D>("/root/Main/EmptyBox");
+		
+		foreach (var bulletPosition in bulletPositions)
+		{
+			var id = bulletPosition.Key;
+
+			var bullet = GetNodeOrNull<Bullet>($"/root/Main/EmptyBox/Bullet_{id}");
+
+			if (bullet == null)
+			{
+				bullet = new Bullet();
+				map.AddChild(bullet);
+				bullet.Name = $"Bullet_{id}";
+			}
+			
+			bullet.Position = bulletPosition.Value;
+			bullet.Rotation = bulletRotations[id];
+		}
+		
+		foreach (var bulletToDespawn in map
+					 .FindChildren("Bullet_")
+					 .Cast<Bullet>()
+					 .Select(b => b.GetInstanceId())
+					 .Except(bulletPositions.Keys))
+		{
+			GetNode<Bullet>($"/root/Main/EmptyBox/Bullet_{bulletToDespawn}")
+				.QueueFree();
 		}
 		
 		processedTanks.Clear();

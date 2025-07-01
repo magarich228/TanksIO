@@ -15,7 +15,11 @@ public partial class NetworkManager : Node
 	private float _currentPing;
 	
 	public bool IsServerConnected { get; private set; }
-	public event Action<Dictionary<int, Vector2>, Dictionary<int, float>> OnUpdateGameState; 
+	public event Action<
+		Dictionary<int, Vector2>, 
+		Dictionary<int, float>, 
+		Dictionary<ulong, Vector2>, 
+		Dictionary<ulong, float>> OnUpdateGameState; 
 
 	public override void _Ready()
 	{
@@ -93,9 +97,13 @@ public partial class NetworkManager : Node
 	}
 	
 	[Rpc(CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-	public void UpdateGameState(Dictionary<int, Vector2> positions, Dictionary<int, float> rotations)
+	public void UpdateGameState(
+		Dictionary<int, Vector2> positions, 
+		Dictionary<int, float> rotations, 
+		Dictionary<ulong, Vector2> bulletPositions, 
+		Dictionary<ulong, float> bulletRotations)
 	{
-		OnUpdateGameState?.Invoke(positions, rotations);
+		OnUpdateGameState?.Invoke(positions, rotations, bulletPositions, bulletRotations);
 	}
 	
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]

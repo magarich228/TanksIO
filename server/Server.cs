@@ -1,3 +1,4 @@
+using System.Linq;
 using Godot;
 using Godot.Collections;
 
@@ -33,17 +34,31 @@ public partial class Server : Node
 	{
 		var positions = new Dictionary<int, Vector2>();
 		var rotations = new Dictionary<int, float>();
+		var bulletPositions = new Dictionary<ulong, Vector2>();
+		var bulletRotations = new Dictionary<ulong, float>();
 
 		foreach (var tank in tanks)
 		{
 			positions.Add(tank.Key, tank.Value.Position);
 			rotations.Add(tank.Key, tank.Value.Rotation);
 		}
+
+		foreach (var bullet in GetNode<Node2D>("/root/Main/EmptyBox")
+					 .FindChildren("Bullet_")
+					 .Cast<Bullet>())
+		{
+			var id = bullet.GetInstanceId();
+			
+			bulletPositions.Add(id, bullet.Position);
+			bulletRotations.Add(id, bullet.Rotation);
+		}
 		
 		networkManager.Rpc(
 			nameof(NetworkManager.UpdateGameState),
 			positions,
-			rotations);
+			rotations,
+			bulletPositions,
+			bulletRotations);
 		
 		base._Process(delta);
 	}
