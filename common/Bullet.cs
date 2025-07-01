@@ -16,7 +16,6 @@ public partial class Bullet : RigidBody2D
 	
 	public override void _Ready()
 	{
-		// Создаем и настраиваем таймер
 		_lifeTimer = new Timer
 		{
 			WaitTime = LifeTime,
@@ -89,10 +88,8 @@ public partial class Bullet : RigidBody2D
 		{
 			_bouncesLeft--;
 			
-			// Создаем эффект рикошета
 			// CreateRicochetEffect();
 			
-			// Уничтожаем пулю после последнего отскока
 			if (_bouncesLeft <= 0)
 			{
 				_hasHit = true;
