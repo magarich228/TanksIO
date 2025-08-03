@@ -1,6 +1,7 @@
 using System;
 using Godot;
 using Godot.Collections;
+using DateTime = System.DateTime;
 
 public partial class PlayerTank : CharacterBody2D
 {
@@ -16,10 +17,9 @@ public partial class PlayerTank : CharacterBody2D
 	private Dictionary<string, float> currentInput = new();
 
 	[Export] private PackedScene _bulletScene;
-	[Export] private float _fireRate = 0.5f;
+	[Export] private float _fireRate = 0.5f; // TODO: move to tank weapon
 	[Export] private float _bulletSpeedMultiplier = 1.0f;
-	
-	private float _fireCooldown;
+	private DateTime _lastShotTime;
 	
 	private NetworkManager networkManager;
 
@@ -72,7 +72,7 @@ public partial class PlayerTank : CharacterBody2D
 				["rotate"] = Input.GetAxis("rotate_left", "rotate_right")
 			};
 
-			if (Input.IsActionJustPressed("shoot"))
+			if (Input.IsActionPressed("shoot"))
 			{
 				input.Add("shoot", 1.0f);
 			}
@@ -97,7 +97,12 @@ public partial class PlayerTank : CharacterBody2D
 	
 	private void Shoot()
 	{
-		if (_bulletScene == null) return;
+		if (_bulletScene == null) 
+			return;
+
+		if (_lastShotTime != default && 
+		    _lastShotTime + TimeSpan.FromSeconds(_fireRate) >= DateTime.Now)
+			return;
 		
 		var bullet = _bulletScene.Instantiate<Bullet>();
 		bullet.Name = bullet.GetInstanceId()
@@ -107,6 +112,8 @@ public partial class PlayerTank : CharacterBody2D
 		
 		Vector2 spawnPos = Position + new Vector2(0, -30).Rotated(Rotation);
 		bullet.Initialize(this, spawnPos, Rotation, _bulletSpeedMultiplier);
+		
+		_lastShotTime = DateTime.Now;
 		
 		OnShoot?.Invoke(bullet);
 		
