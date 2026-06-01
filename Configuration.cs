@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Linq;
 using System.Text.Json;
 
 namespace TanksIO;
@@ -10,7 +12,15 @@ public class Configuration
 
     public void Load()
     {
-        using var file = File.Open("config.json", FileMode.Open);
+        var path = "config.json";
+
+        if (!Path.Exists(path))
+        {
+            path = Directory.GetFiles("./", "config.json", SearchOption.AllDirectories)
+                .FirstOrDefault() ?? throw new ApplicationException("config.json not found");
+        }
+        
+        using var file = File.Open(path, FileMode.Open);
         using var reader = new StreamReader(file);
         var json = reader.ReadToEnd();
         
