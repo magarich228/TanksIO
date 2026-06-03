@@ -6,6 +6,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		README.md = README.md
+		build.ps1 = build.ps1
+		export_presets.cfg = export_presets.cfg
 	EndProjectSection
 EndProject
 Global
