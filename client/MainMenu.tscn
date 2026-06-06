@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://cq7c2qh7gcf7q"]
+
+[ext_resource type="Script" uid="uid://rrdmx22fuxwy" path="res://client/MainMenu.cs" id="1_u4hs3"]
+
+[node name="MainMenu" type="Control" unique_id=143630695]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_u4hs3")
+
+[node name="BoxContainer" type="BoxContainer" parent="." unique_id=339120329]
+z_index = 1
+layout_mode = 0
+offset_left = 556.0
+offset_top = 290.0
+offset_right = 597.0
+offset_bottom = 356.0
+grow_horizontal = 2
+grow_vertical = 2
+vertical = true
+
+[node name="PlayButton" type="Button" parent="BoxContainer" unique_id=51628209]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "play"
+
+[node name="ExitButton" type="Button" parent="BoxContainer" unique_id=1211985211]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "exit"
+
+[node name="Background" type="ColorRect" parent="." unique_id=1762216530]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.25490198, 0.42352942, 1, 1)

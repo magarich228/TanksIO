@@ -101,7 +101,7 @@ public partial class PlayerTank : CharacterBody2D
 			return;
 
 		if (_lastShotTime != default && 
-		    _lastShotTime + TimeSpan.FromSeconds(_fireRate) >= DateTime.Now)
+			_lastShotTime + TimeSpan.FromSeconds(_fireRate) >= DateTime.Now)
 			return;
 		
 		var bullet = _bulletScene.Instantiate<Bullet>();
