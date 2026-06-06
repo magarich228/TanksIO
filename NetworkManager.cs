@@ -19,13 +19,22 @@ public partial class NetworkManager : Node
 		Dictionary<int, Vector2>, 
 		Dictionary<int, float>, 
 		Dictionary<ulong, Vector2>, 
-		Dictionary<ulong, float>> OnUpdateGameState; 
+		Dictionary<ulong, float>> OnUpdateGameState;
+	
+	public override void _EnterTree()
+	{
+		GD.Print("NetworkManager loaded.");
+
+		var mainNode = GetNodeOrNull<Main>("/root/Main");
+		
+		if (mainNode is not null && !mainNode.IsServer)
+			_connectionStatusLabel = GetNodeOrNull<Label>("/root/Main/UI/PingLabel");
+		
+		base._EnterTree();
+	}
 
 	public override void _Ready()
 	{
-		GD.Print("NetworkManager loaded.");
-		_connectionStatusLabel = GetNode<Label>("/root/Main/UI/PingLabel");
-		
 		base._Ready();
 	}
 

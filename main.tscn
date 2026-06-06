@@ -1,17 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://6mu73r8dauop"]
+[gd_scene format=3 uid="uid://6mu73r8dauop"]
 
-[ext_resource type="Script" path="res://Main.cs" id="1_7bi66"]
-[ext_resource type="PackedScene" uid="uid://c5iy3t6x15rab" path="res://maps/Map.tscn" id="1_w45ip"]
+[ext_resource type="Script" uid="uid://b4ppnqhdge18g" path="res://Main.cs" id="1_7bi66"]
 
-[node name="Main" type="Node2D"]
+[node name="Main" type="Node2D" unique_id=981828845]
 script = ExtResource("1_7bi66")
-
-[node name="Map" parent="." instance=ExtResource("1_w45ip")]
-
-[node name="UI" type="Node2D" parent="."]
-
-[node name="PingLabel" type="Label" parent="UI"]
-offset_left = 966.0
-offset_top = 62.0
-offset_right = 1006.0
-offset_bottom = 85.0

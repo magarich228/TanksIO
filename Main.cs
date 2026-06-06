@@ -16,7 +16,7 @@ public partial class Main : Node2D
 		
 		Node node = isServer ? 
 			ResourceLoader.Load<PackedScene>("res://server/Server.tscn").Instantiate() : 
-			ResourceLoader.Load<PackedScene>("res://client/Client.tscn").Instantiate();
+			ResourceLoader.Load<PackedScene>("res://client/MainMenu.tscn").Instantiate();
 		
 		AddChild(node);
 	}

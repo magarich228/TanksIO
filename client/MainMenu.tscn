@@ -11,6 +11,14 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_u4hs3")
 
+[node name="ColorRect" type="ColorRect" parent="." unique_id=635601197]
+z_index = -1
+layout_mode = 0
+offset_right = 1151.0
+offset_bottom = 647.0
+mouse_filter = 2
+color = Color(0, 0.45882353, 1, 1)
+
 [node name="BoxContainer" type="BoxContainer" parent="." unique_id=339120329]
 z_index = 1
 layout_mode = 0
@@ -23,21 +31,19 @@ grow_vertical = 2
 vertical = true
 
 [node name="PlayButton" type="Button" parent="BoxContainer" unique_id=51628209]
+z_index = 2
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
+mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 26
 text = "play"
 
 [node name="ExitButton" type="Button" parent="BoxContainer" unique_id=1211985211]
+z_index = 2
 layout_mode = 2
+mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 26
 text = "exit"
 
-[node name="Background" type="ColorRect" parent="." unique_id=1762216530]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.25490198, 0.42352942, 1, 1)
+[connection signal="button_down" from="BoxContainer/PlayButton" to="." method="OnPlayButtonDown"]
+[connection signal="button_down" from="BoxContainer/ExitButton" to="." method="OnExitButtonDown"]
